@@ -5,6 +5,10 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.ServerSocket
 import java.net.Socket
+import java.net.SocketTimeoutException
+
+const val SERVER_SOCKET_TIMEOUT = 2000
+const val SERVER_SOCKET_ACCEPT_INTERVAL = 100L
 
 class ImageProcessServer(
     private val port: Int,
@@ -15,6 +19,7 @@ class ImageProcessServer(
     fun run() {
         try {
             ServerSocket(port).use { serverSocket ->
+                serverSocket.soTimeout = SERVER_SOCKET_TIMEOUT
                 isRunning = true
                 println("Run server. port=$port")
                 runServerLoop(serverSocket)
@@ -27,10 +32,14 @@ class ImageProcessServer(
     private fun runServerLoop(serverSocket: ServerSocket) {
         while (isRunning) {
             try {
+                System.out.flush()
                 serverSocket.accept().use { clientSocket ->
                     println("Accept a client socket. remotePort=" + clientSocket.port)
                     runScanLoop(clientSocket)
                 }
+            } catch (e: SocketTimeoutException) {
+                Thread.sleep(SERVER_SOCKET_ACCEPT_INTERVAL)
+                continue
             } catch (e: IOException) {
                 println("Failed to accept a client socket: ${e.message}")
             }
@@ -43,7 +52,7 @@ class ImageProcessServer(
                 clientSocket.getOutputStream().use { outputStream ->
                     DataOutputStream(outputStream).use { dataOutputStream ->
                         var isScanning = false
-                        while (true) {
+                        while (isRunning) {
                             if (inputStreamReader.ready()) {
                                 val c = inputStreamReader.read()
                                 isScanning = if (c == -1) {

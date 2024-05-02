@@ -15,7 +15,7 @@ import com.t34400.questscreencapture.server.IImageProcessor
 import com.t34400.questscreencapture.server.IPacketWriter
 import com.t34400.questscreencapture.server.Rect
 
-class BarcodeScannerWrapper : IImageProcessor {
+class BarcodeScanner : IImageProcessor {
     private val reader: MultiFormatReader = MultiFormatReader()
 
     init {
@@ -34,6 +34,7 @@ class BarcodeScannerWrapper : IImageProcessor {
         val result: Result = try {
             reader.decodeWithState(binaryBitmap)
         } catch (e: NotFoundException) {
+            println("Barcode Not Found")
             return null
         }
         return result

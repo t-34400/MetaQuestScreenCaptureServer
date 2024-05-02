@@ -20,87 +20,98 @@ object ScreenShotTaker {
 
     @SuppressLint("SdCardPath")
     private const val SCREENSHOT_DIRECTORY_PATH = "/sdcard/Oculus/Screenshots/"
-    private const val SCREENSHOT_PREFIX = "com.oculus.vrshell-"
 
-    private const val SCREENSHOT_SAVE_WAIT_TIMEOUT = 2000
-    private const val SCREENSHOT_SAVE_CHECK_INTERVAL = 100L
+    private const val SCREENSHOT_SAVE_WAIT_TIMEOUT = 5000
+    private const val SCREENSHOT_SAVE_CHECK_INTERVAL = 200L
+
+    private const val CAPTURE_INTERVAL = 1000L
 
     fun takeScreenShot(): ScreenShotData? {
         val originalScreenShotCount = getCurrentScreenShotFiles()?.size ?: 0
         val captured = captureScreen()
         if (captured) {
-            val timestamp = System.currentTimeMillis()
-            waitForScreenshotSave(originalScreenShotCount)?.let { screenshotFile ->
-                val bitmap = loadScreenShotFile(screenshotFile)
-                screenshotFile.delete()
-                bitmap?.let {
-                    return ScreenShotData(timestamp, bitmap)
-                }
-            }
+            return loadLatestScreenShot(originalScreenShotCount)
         }
 
+        Thread.sleep(CAPTURE_INTERVAL)
         return null
     }
 
     private fun getCurrentScreenShotFiles(): Array<File>? {
         val directory = File(SCREENSHOT_DIRECTORY_PATH)
-        return directory.listFiles { _, name ->
-            name.startsWith(SCREENSHOT_PREFIX) && name.endsWith(
-                ".jpg"
-            )
-        }
+        return directory.listFiles { _, name -> name.endsWith(".jpg") }
     }
 
     private fun captureScreen(): Boolean {
         val process = Runtime.getRuntime().exec(TAKE_SCREENSHOT_COMMAND)
-        val exitCode = process.waitFor()
+        val exitCode = process.waitFor().also {
+            if (it != 0) {
+                println("Failed to take a screenshot: Exit code = $it")
+            }
+        }
         return exitCode == 0
     }
 
-    private fun waitForScreenshotSave(originalScreenShotCount: Int): File? {
-        val startTime = System.currentTimeMillis()
-        var screenshotFiles = getCurrentScreenShotFiles()
-        var currentCount = screenshotFiles?.size ?: 0
+    private fun loadLatestScreenShot(originalScreenshotCount: Int): ScreenShotData? {
+        val dateFormat = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.getDefault()).apply {
+            isLenient = false
+        }
 
-        while (currentCount <= originalScreenShotCount) {
+        val startTime = System.currentTimeMillis()
+        var captureTimestamp = startTime
+        var latestScreenshotFile: File? = null
+        var latestScreenshotBitmap: Bitmap? = null
+
+        while (latestScreenshotBitmap == null) {
             if (System.currentTimeMillis() - startTime >= SCREENSHOT_SAVE_WAIT_TIMEOUT) {
                 println("Timeout occurred. Screenshots were not saved.")
                 return null
             }
-            screenshotFiles = getCurrentScreenShotFiles()
-            currentCount = screenshotFiles?.size ?: 0
+
+            latestScreenshotFile?.let {
+                latestScreenshotBitmap = loadScreenShotFile(it)
+            } ?: run {
+                latestScreenshotFile = getLatestScreenShotFile(originalScreenshotCount, dateFormat)?.also {
+                    captureTimestamp = System.currentTimeMillis()
+                }
+            }
 
             Thread.sleep(SCREENSHOT_SAVE_CHECK_INTERVAL)
         }
 
+        latestScreenshotFile?.delete()
+        return latestScreenshotBitmap?.let { bitmap ->
+            ScreenShotData(captureTimestamp, bitmap)
+        }
+    }
 
-        val dateFormat = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.getDefault())
-        dateFormat.isLenient = false
-        var latestScreenshot: File? = null
+    private fun getLatestScreenShotFile(originalScreenshotCount: Int, dateFormat: SimpleDateFormat) : File? {
+        val screenshotFiles = getCurrentScreenShotFiles()
+        val currentScreenshotCount = screenshotFiles?.size ?: 0
+        var latestScreenshotFile: File? = null
         var latestDate: Date? = null
 
-        screenshotFiles?.forEach { file ->
-            val fileName = file.nameWithoutExtension
-            val date = try {
-                dateFormat.parse(fileName.substringAfter("-"))
-            } catch (e: Exception) {
-                null
-            }
-            if (date != null && (latestDate == null || date.after(latestDate))) {
-                latestDate = date
-                latestScreenshot = file
+        if (currentScreenshotCount > originalScreenshotCount) {
+            screenshotFiles?.forEach { file ->
+                val fileName = file.nameWithoutExtension
+                val date = try {
+                    dateFormat.parse(fileName.substringAfter("-"))
+                } catch (e: Exception) {
+                    null
+                }
+                if (date != null && (latestDate == null || date.after(latestDate))) {
+                    latestDate = date
+                    latestScreenshotFile = file
+                }
             }
         }
 
-        return latestScreenshot
+        return latestScreenshotFile
     }
 
     private fun loadScreenShotFile(screenshotFile: File): Bitmap? {
         return try {
-            BitmapFactory.decodeFile(screenshotFile.absolutePath) ?: run {
-                println("Failed to decode screenshot.")
-                null
-            }
+            BitmapFactory.decodeFile(screenshotFile.absolutePath)
         } catch (e: Exception) {
             println("Error occurred while processing screenshot: ${e.message}")
             null
