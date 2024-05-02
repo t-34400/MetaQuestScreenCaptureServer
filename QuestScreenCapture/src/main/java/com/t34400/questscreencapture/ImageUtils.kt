@@ -3,7 +3,6 @@ package com.t34400.questscreencapture
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.media.Image
-import java.nio.ByteBuffer
 
 object ImageUtils {
     fun convertRGBA8888toIntArray(image: Image): IntArray {
