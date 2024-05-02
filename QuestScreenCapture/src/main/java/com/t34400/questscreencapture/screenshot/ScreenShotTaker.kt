@@ -82,7 +82,6 @@ object ScreenShotTaker {
         screenshotFiles?.forEach { file ->
             val fileName = file.nameWithoutExtension
             val date = try {
-                println(fileName.substringAfter("-"))
                 dateFormat.parse(fileName.substringAfter("-"))
             } catch (e: Exception) {
                 null

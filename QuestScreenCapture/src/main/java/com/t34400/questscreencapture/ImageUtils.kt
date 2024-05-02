@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.media.Image
 
 object ImageUtils {
-    fun convertRGBA8888toIntArray(image: Image): IntArray {
+    fun convertRGBA8888toPixels(image: Image): IntArray {
         val planes = image.planes
         val buffer = planes[0].buffer
         val pixelStride = planes[0].pixelStride
@@ -28,7 +28,7 @@ object ImageUtils {
         return pixels
     }
 
-    fun convertBitmapToIntArray(bitmap: Bitmap): IntArray {
+    fun convertBitmapToPixels(bitmap: Bitmap): IntArray {
         val width = bitmap.width
         val height = bitmap.height
         val pixels = IntArray(width * height)

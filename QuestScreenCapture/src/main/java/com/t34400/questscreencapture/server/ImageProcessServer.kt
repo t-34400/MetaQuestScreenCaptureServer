@@ -68,7 +68,7 @@ class ImageProcessServer(
                                     return
                                 }
 
-                            imageProcessor.processImage(image.pixels, image.width, image.height, image.unixTime)
+                            imageProcessor.processImage(image.pixels, image.width, image.height, image.unixTime, image.cropRect)
                                 ?.writePacket(dataOutputStream)
                                 ?: {
                                 // Check if client's alive
