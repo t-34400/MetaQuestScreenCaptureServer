@@ -79,7 +79,7 @@ class ImageProcessServer(
 
                             imageProcessor.processImage(image.pixels, image.width, image.height, image.unixTime, image.cropRect)
                                 ?.writePacket(dataOutputStream)
-                                ?: {
+                                ?: run {
                                 // Check if client's alive
                                 dataOutputStream.writeInt(-1)
                             }
