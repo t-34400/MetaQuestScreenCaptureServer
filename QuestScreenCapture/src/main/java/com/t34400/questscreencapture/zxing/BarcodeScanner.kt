@@ -29,7 +29,7 @@ class BarcodeScanner : IImageProcessor {
         reader.setHints(hints)
     }
 
-    fun scanBarcode(source: LuminanceSource?): Result? {
+    private fun scanBarcode(source: LuminanceSource?): Result? {
         val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
         val result: Result = try {
             reader.decodeWithState(binaryBitmap)

@@ -1,5 +1,6 @@
 package com.t34400.questscreencapture
 
+import com.t34400.questscreencapture.display.DisplaySurfaceReader
 import com.t34400.questscreencapture.screenshot.ScreenShotTaker
 import com.t34400.questscreencapture.server.IImageProvider
 import com.t34400.questscreencapture.server.ImageProcessServer
@@ -19,10 +20,7 @@ class ServerLauncher {
             val port = args.getOrNull(0)?.toIntOrNull() ?: 8010
 
             val imageProvider = when (args.getOrNull(1)?.uppercase(Locale.getDefault())) {
-                "DISPLAY" -> {
-                    println("Display image provider is not implemented yet.")
-                    return
-                }
+                "DISPLAY" -> DisplaySurfaceReader()
                 else -> {
                     object : IImageProvider {
                         override fun getLatestImage(): InputImage? {
@@ -34,6 +32,8 @@ class ServerLauncher {
                                 InputImage(pixels, width, height, unixTime)
                             }
                         }
+                        override fun close() {
+                        }
                     }
                 }
             }
@@ -42,6 +42,7 @@ class ServerLauncher {
 
             println("Starting server on port $port")
             ImageProcessServer(port, imageProvider, imageProcessor).run()
+            imageProvider.close()
         }
     }
 }

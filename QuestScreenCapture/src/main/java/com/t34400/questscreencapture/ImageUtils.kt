@@ -5,13 +5,19 @@ import android.graphics.Color
 import android.media.Image
 
 object ImageUtils {
-    fun convertRGBA8888toPixels(image: Image): IntArray {
+    fun convertRGBA8888toPixels(image: Image, reusePixels: IntArray? = null): IntArray {
         val planes = image.planes
         val buffer = planes[0].buffer
         val pixelStride = planes[0].pixelStride
         val rowStride = planes[0].rowStride
         val rowPadding = rowStride - pixelStride * image.width
-        val pixels = IntArray(image.width * image.height)
+
+        val pixels = if (reusePixels != null && reusePixels.size == image.width * image.height) {
+            reusePixels
+        } else {
+            IntArray(image.width * image.height)
+        }
+
         var offset = 0
         for (row in 0 until image.height) {
             for (col in 0 until image.width) {

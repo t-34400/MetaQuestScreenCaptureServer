@@ -1,5 +1,7 @@
 package com.t34400.questscreencapture.server
 
-interface IImageProvider {
+import java.io.Closeable
+
+interface IImageProvider : Closeable {
     fun getLatestImage() : InputImage?
 }
