@@ -1,3 +1,11 @@
+/*
+ * This file is largely borrowed from [Genymobile/scrcpy](https://github.com/Genymobile/scrcpy),
+ * which includes code licensed under the Apache License, Version 2.0.
+ * You may obtain a copy of the Apache License, Version 2.0 at:
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
 package com.t34400.questscreencapture.display;
 
 import android.annotation.SuppressLint;
