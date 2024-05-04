@@ -40,8 +40,8 @@ https://github.com/t-34400/MetaQuestScreenBarcodeReader/assets/49368264/721a8a5b
       - Size of the barcode's Raw Value (4-byte big-endian integer)
       - Number of detected feature points (4-byte big-endian integer)
       - Unix Time [ms] when the image was captured (8-byte big-endian integer)
-      - Positions x, y of feature points (as many 4-byte big-endian floating-point numbers as detected)
       - Raw Value (big-endian, UTF8)
+      - Positions x, y of feature points (as many 4-byte big-endian floating-point numbers as detected)
    - If the scan fails, -1 will be sent as a 4-byte big-endian integer.
 
 Unity sample package for client scripts is available for download from the repository's Release. 
