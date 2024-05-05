@@ -46,6 +46,32 @@ https://github.com/t-34400/MetaQuestScreenBarcodeReader/assets/49368264/721a8a5b
 
 Unity sample package for client scripts is available for download from the repository's Release. 
 
+## Screen to Camera Coordinate Transformation
+To transform the position on the screenshot to real-world coordinates relative to the center camera, the following transformation is applied:
+```math
+(x_c, y_c, \text{depth}) \mapsto (X, Y, \text{depth})
+```
+
+Where:
+- $`(x_c, y_c)`$: Coordinates on the screenshot, normalized to the range [0, 1].
+- depth: Depth from the center camera.
+- X, Y: Vertical relative positions with respect to the camera.
+
+The transformation was empirically measured and fitted with a second-order polynomial, yielding the following equations:
+
+| Polynomial   | Coefficient(X) | Coefficient(Y) |
+|--------------|----------------|----------------|
+| Constant     | -0.034031      | 0.000808       |
+| $x_c$        | -0.002005      | -0.002539      |
+| $y_c$        | -0.000078      | 0.002363       |
+| $depth$      | -0.834209      | 0.836051       |
+| $x_c^2$      | 0.000228       | 0.000794       |
+| $x_c * y_c$  | 0.002781       | -0.003242      |
+| $x_c * depth$| 1.675339       | 0.003726       |
+| $y_c^2$      | 0.000195       | -0.001518      |
+| $y_c * depth$| -0.001481      | -1.673221      |
+| $depth^2$    | -0.002061      | -0.001475      |
+
 ## License
 [MIT License](LICENSE)
 
