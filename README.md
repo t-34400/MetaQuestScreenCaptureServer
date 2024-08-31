@@ -1,6 +1,13 @@
 # Meta Quest Screen Barcode Reader
 This repository contains scripts to set up a server that reads barcodes from Meta Quest's screen and sends them to clients. 
 It enables barcode reading from the front camera by combining it with pass-through functionality.
+
+## ⚠️ Deprecation Notice ⚠️
+
+As of **August 12, 2024**, Meta has re-enabled the **Media Projection API**, which allows direct screen capture on Meta Quest devices. This means that using ADB for screen capture is no longer necessary. This library was initially created to address the lack of screen capture functionality when the Media Projection API was disabled, but it is now largely obsolete.
+
+**We recommend utilizing the Media Projection API for a more straightforward and efficient solution.**
+
 ## Demo
 https://github.com/t-34400/MetaQuestScreenBarcodeReader/assets/49368264/3b8a5c36-1c15-481e-8127-53306258a3d8
 
