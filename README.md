@@ -8,6 +8,8 @@ As of **August 12, 2024**, Meta has re-enabled the **Media Projection API**, whi
 
 **We recommend utilizing the Media Projection API for a more straightforward and efficient solution.**
 
+For an example of how to implement Media Projection in Unity, please refer to [our repository](https://github.com/t-34400/QuestMediaProjection).
+
 ## Demo
 https://github.com/t-34400/MetaQuestScreenBarcodeReader/assets/49368264/3b8a5c36-1c15-481e-8127-53306258a3d8
 
